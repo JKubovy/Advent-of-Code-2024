@@ -29,11 +29,9 @@ fn check_line(data: &[u32]) -> SafeStatus {
             |(last, flow, status), &next_number| match (last, flow, status) {
                 (_, _, SafeStatus::Unsafe) => (last, flow, status),
                 (None, _, _) => (Some(next_number), FlowDirection::Unknown, SafeStatus::Safe),
-                (Some(last), _, _) if last == next_number || last.abs_diff(next_number) > 3 => (
-                    Some(next_number),
-                    FlowDirection::Unknown,
-                    SafeStatus::Unsafe,
-                ),
+                (Some(last), _, _) if last == next_number || last.abs_diff(next_number) > 3 => {
+                    (Some(next_number), flow, SafeStatus::Unsafe)
+                }
                 (Some(last), FlowDirection::Unknown, _) => (
                     Some(next_number),
                     if last < next_number {
