@@ -53,36 +53,31 @@ fn check_line(data: &[u32]) -> SafeStatus {
         .2
 }
 
-fn first_part(input: &str) -> u32 {
+fn first_part(input: &str) -> usize {
     parse(input)
         .iter()
         .map(|line| check_line(line))
         .filter(|&s| s == SafeStatus::Safe)
         .count()
-        .try_into()
-        .expect("Can't parse usize to u32")
 }
 
-fn second_part(input: &str) -> u32 {
+fn second_part(input: &str) -> usize {
     parse(input)
         .iter()
-        .map(|line| {
+        .filter_map(|line| {
             if let SafeStatus::Safe = check_line(line) {
-                return SafeStatus::Safe;
+                return Some(());
             }
             for i in 0..line.len() {
                 let mut line_without_one_record = line.clone();
                 line_without_one_record.remove(i);
                 if let SafeStatus::Safe = check_line(&line_without_one_record) {
-                    return SafeStatus::Safe;
+                    return Some(());
                 }
             }
-            SafeStatus::Unsafe
+            None
         })
-        .filter(|&s| s == SafeStatus::Safe)
         .count()
-        .try_into()
-        .expect("Can't parse usize to u32")
 }
 
 fn main() {
