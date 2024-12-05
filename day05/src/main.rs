@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use utils::StrParser;
 
 struct Rules {
@@ -57,6 +55,27 @@ fn get_middle(line: &Vec<usize>) -> usize {
     *line.get(lenght.wrapping_div(2)).unwrap()
 }
 
+fn fix_line(rules: &Rules, line: &Vec<usize>) -> Vec<usize> {
+    let mut result = vec![];
+    let mut rules = rules
+        .data
+        .iter()
+        .filter(|(a, b)| line.contains(a) && line.contains(b))
+        .collect::<Vec<_>>();
+    // what if there is some numbers without rules where to put them?
+    for _ in 0..line.len() {
+        let next = rules
+            .iter()
+            .find(|(a, _)| !rules.iter().any(|(_, x)| a == x))
+            .map(|a| a.0);
+        if let Some(next) = next {
+            rules.retain(|(a, _)| *a != next);
+            result.push(next);
+        }
+    }
+    result
+}
+
 fn first_part(input: &str) -> usize {
     let (rules, data) = parse_input(input);
     data.iter()
@@ -66,7 +85,15 @@ fn first_part(input: &str) -> usize {
 }
 
 fn second_part(input: &str) -> usize {
-    todo!();
+    let (rules, data) = parse_input(input);
+    data.iter()
+        .filter_map(|line| {
+            if !check_line_rules(&rules, line) {
+                return Some(get_middle(&fix_line(&rules, line)));
+            }
+            None
+        })
+        .sum()
 }
 
 fn main() {
@@ -99,13 +126,13 @@ mod tests {
     fn test_second_part() {
         let data = include_str!("../inputs/test.txt");
         let result = second_part(data);
-        assert_eq!(result, todo!());
+        assert_eq!(result, 123);
     }
 
     #[test]
     fn input_second_part() {
         let data = include_str!("../inputs/input.txt");
         let result = second_part(data);
-        assert_eq!(result, todo!());
+        assert_eq!(result, 4971);
     }
 }
