@@ -32,7 +32,7 @@ fn parse_input(input: &str) -> (Rules, Vec<Vec<usize>>) {
     (result.0, result.1)
 }
 
-fn check_line_rules(rules: &Rules, line: &Vec<usize>) -> bool {
+fn check_line_rules(rules: &Rules, line: &[usize]) -> bool {
     let mut seen = vec![];
     let mut all_rules_ok = true;
     line.iter().for_each(|n| {
@@ -40,7 +40,7 @@ fn check_line_rules(rules: &Rules, line: &Vec<usize>) -> bool {
             rules
                 .data
                 .iter()
-                .filter(|(a, b)| b == seen_number)
+                .filter(|(_a, b)| b == seen_number)
                 .all(|(a, _)| a != n)
         }) {
             all_rules_ok = false
@@ -50,12 +50,12 @@ fn check_line_rules(rules: &Rules, line: &Vec<usize>) -> bool {
     all_rules_ok
 }
 
-fn get_middle(line: &Vec<usize>) -> usize {
+fn get_middle(line: &[usize]) -> usize {
     let lenght = line.len();
     *line.get(lenght.wrapping_div(2)).unwrap()
 }
 
-fn fix_line(rules: &Rules, line: &Vec<usize>) -> Vec<usize> {
+fn fix_line(rules: &Rules, line: &[usize]) -> Vec<usize> {
     let mut result = vec![];
     let mut rules = rules
         .data
@@ -80,7 +80,7 @@ fn first_part(input: &str) -> usize {
     let (rules, data) = parse_input(input);
     data.iter()
         .filter(|&line| check_line_rules(&rules, line))
-        .map(get_middle)
+        .map(|line| get_middle(line))
         .sum()
 }
 
