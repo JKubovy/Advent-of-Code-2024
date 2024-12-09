@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 use crate::Direction;
 
@@ -24,6 +24,14 @@ impl Add<(isize, isize)> for Coord {
                 self.y.checked_sub(rhs.1.unsigned_abs())?
             },
         })
+    }
+}
+
+impl Sub<(isize, isize)> for Coord {
+    type Output = Option<Coord>;
+
+    fn sub(self, (x, y): (isize, isize)) -> Self::Output {
+        self + (-x, -y)
     }
 }
 
