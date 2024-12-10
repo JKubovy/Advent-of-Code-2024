@@ -1,58 +1,39 @@
 use std::collections::HashMap;
+use utils::StrParser;
 
-fn first_part(input: &str) -> i32 {
-    let (left, right) = get_sorted_lists(input);
-    left.iter()
-        .zip(right)
-        .map(|(a, b)| (a - b).abs())
-        .sum::<i32>()
-        .abs()
-}
-
-fn get_sorted_lists(input: &str) -> (Vec<i32>, Vec<i32>) {
-    let (mut left, mut right): (Vec<_>, Vec<_>) = input
+fn get_lists(input: &str) -> (Vec<usize>, Vec<usize>) {
+    input
         .lines()
         .map(|line| {
             let mut nums = line.split_ascii_whitespace();
             (
-                nums.next()
-                    .expect("Missing first number")
-                    .parse::<i32>()
-                    .expect("First is not a number"),
-                nums.next()
-                    .expect("Missing second number")
-                    .parse::<i32>()
-                    .expect("Second is not a number"),
+                nums.next().unwrap().parse_usize(),
+                nums.next().unwrap().parse_usize(),
             )
         })
-        .unzip();
-    left.sort();
-    right.sort();
-    (left, right)
+        .unzip()
 }
 
-fn second_part(input: &str) -> i32 {
-    let (left, right) = get_sorted_lists(input);
-    let right_counts = right
-        .iter()
-        .fold(
-            (HashMap::new(), None, 0),
-            |(mut data, last_seen, seen_count), n| {
-                if last_seen.is_none() {
-                    return (data, Some(n), 1);
-                }
-                if last_seen.unwrap() == n {
-                    (data, last_seen, seen_count + 1)
-                } else {
-                    data.insert(last_seen.unwrap(), seen_count);
-                    (data, Some(n), 1)
-                }
-            },
-        )
-        .0;
+fn first_part(input: &str) -> usize {
+    let (mut left, mut right) = get_lists(input);
+    left.sort();
+    right.sort();
+    left.iter()
+        .zip(right)
+        .map(|(a, b)| a.abs_diff(b))
+        .sum::<usize>()
+}
+
+fn second_part(input: &str) -> usize {
+    let (left, right) = get_lists(input);
+    let right_counts = right.iter().fold(HashMap::new(), |mut data, n| {
+        data.entry(n).or_default();
+        *data.get_mut(n).unwrap() += 1;
+        data
+    });
     left.iter()
         .map(|n| n * right_counts.get(n).unwrap_or(&0))
-        .sum::<i32>()
+        .sum::<usize>()
 }
 
 fn main() {
