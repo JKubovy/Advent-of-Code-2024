@@ -30,11 +30,7 @@ fn second_part(input: &str) -> usize {
             if skip {
                 return (sum, skip);
             }
-            (
-                sum + num1.parse::<usize>().expect("num1 is NOT number")
-                    * num2.parse::<usize>().expect("num1 is NOT number"),
-                skip,
-            )
+            (sum + num1.parse_usize() * num2.parse_usize(), skip)
         })
         .0
 }
