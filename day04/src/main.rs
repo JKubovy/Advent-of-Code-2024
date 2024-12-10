@@ -1,21 +1,4 @@
-use std::ops::Add;
-
-#[derive(Clone, Copy, Debug)]
-struct Coord {
-    x: isize,
-    y: isize,
-}
-
-impl Add<(isize, isize)> for Coord {
-    type Output = Coord;
-
-    fn add(self, rhs: (isize, isize)) -> Self::Output {
-        Coord {
-            x: self.x + rhs.1,
-            y: self.y + rhs.0,
-        }
-    }
-}
+use utils::Coord;
 
 trait GetChar {
     fn get_by_coord(&self, coord: Coord) -> Option<char>;
@@ -23,11 +6,7 @@ trait GetChar {
 
 impl GetChar for Grid {
     fn get_by_coord(&self, coord: Coord) -> Option<char> {
-        Some(
-            *(self
-                .get(usize::try_from(coord.y).ok()?)?
-                .get(usize::try_from(coord.x).ok()?)?),
-        )
+        Some(*(self.get(coord.y)?.get(coord.x)?))
     }
 }
 
@@ -57,10 +36,7 @@ fn get_possible_starts(grid: &Grid, start: char) -> Vec<Coord> {
     grid.iter().enumerate().for_each(|(y, line)| {
         line.iter().enumerate().for_each(|(x, &character)| {
             if character == start {
-                result.push(Coord {
-                    x: x as isize,
-                    y: y as isize,
-                });
+                result.push((x, y).into());
             }
         })
     });
@@ -74,7 +50,7 @@ fn is_pattern_present(
     pattern: &str,
 ) -> Option<()> {
     for i in 0..pattern.len() {
-        if grid.get_by_coord(start + (direction.0 * i as isize, direction.1 * i as isize))?
+        if grid.get_by_coord((start + (direction.0 * i as isize, direction.1 * i as isize))?)?
             != pattern.chars().nth(i)?
         {
             return None;
@@ -98,15 +74,15 @@ fn first_part(input: &str) -> usize {
 fn is_x_mas(grid: &Grid, start: Coord) -> Option<()> {
     let top_left = start + (-1, -1);
     let bottom_left = start + (1, -1);
-    is_pattern_present(grid, top_left, &(1, 1), MAS).or(is_pattern_present(
+    is_pattern_present(grid, top_left?, &(1, 1), MAS).or(is_pattern_present(
         grid,
-        top_left,
+        top_left?,
         &(1, 1),
         SAM,
     ))?;
-    is_pattern_present(grid, bottom_left, &(-1, 1), MAS).or(is_pattern_present(
+    is_pattern_present(grid, bottom_left?, &(-1, 1), MAS).or(is_pattern_present(
         grid,
-        bottom_left,
+        bottom_left?,
         &(-1, 1),
         SAM,
     ))?;
